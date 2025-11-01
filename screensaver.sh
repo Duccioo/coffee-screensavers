@@ -7,8 +7,8 @@
 #
 
 BASH_SCREENSAVERS_NAME='Bash Screensavers'
-BASH_SCREENSAVERS_VERSION='0.0.27'
-BASH_SCREENSAVERS_CODENAME='Mystic Shine'
+BASH_SCREENSAVERS_VERSION='0.0.28'
+BASH_SCREENSAVERS_CODENAME='Mystic Map'
 BASH_SCREENSAVERS_URL='https://github.com/attogram/bash-screensavers'
 BASH_SCREENSAVERS_DISCORD='https://discord.gg/BGQJCbYVBa'
 BASH_SCREENSAVERS_LICENSE='MIT'
@@ -76,11 +76,7 @@ intro() {
 choose_screensaver() {
   intro
   local screensavers=()
-  if command -v mapfile >/dev/null 2>&1; then
-    mapfile -t screensavers < <(peak_into_the_gallery)
-  else
-    while IFS= read -r line; do screensavers+=("$line"); done < <(peak_into_the_gallery)
-  fi
+  while IFS= read -r line; do screensavers+=("$line"); done < <(peak_into_the_gallery)
   if [[ ${#screensavers[@]} -eq 0 ]]; then
     echo "Whoops! No screensavers found. Add some to the '$BASH_SCREENSAVERS_GALLERY' directory."
     echo
@@ -258,11 +254,7 @@ BASH_SCREENSAVERS_USAGE="Usage: $0 [-h|--help] [-v|--version] [-n <name>|--new <
 run_direct() {
     local choice="$1"
     local screensavers=()
-    if command -v mapfile >/dev/null 2>&1; then
-        mapfile -t screensavers < <(peak_into_the_gallery)
-    else
-        while IFS= read -r line; do screensavers+=("$line"); done < <(peak_into_the_gallery)
-    fi
+    while IFS= read -r line; do screensavers+=("$line"); done < <(peak_into_the_gallery)
     if [[ ${#screensavers[@]} -eq 0 ]]; then
         echo "Whoops! No screensavers found." >&2
         exit 1
@@ -297,11 +289,7 @@ run_direct() {
 
 run_random() {
     local screensavers=()
-    if command -v mapfile >/dev/null 2>&1; then
-        mapfile -t screensavers < <(peak_into_the_gallery)
-    else
-        while IFS= read -r line; do screensavers+=("$line"); done < <(peak_into_the_gallery)
-    fi
+    while IFS= read -r line; do screensavers+=("$line"); done < <(peak_into_the_gallery)
     if [[ ${#screensavers[@]} -eq 0 ]]; then
         echo "Whoops! No screensavers found." >&2
         exit 1
