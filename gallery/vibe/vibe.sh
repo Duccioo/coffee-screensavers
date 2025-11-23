@@ -70,7 +70,7 @@ GLITCHES=(
 # The maximum length of the character streams
 MAX_STREAM_LEN=20
 # Animation speed (lower is faster)
-DELAY=0.04
+DELAY=${SCREENSAVER_DELAY:-0.033}
 
 _cleanup_and_exit() { # handler for SIGINT (Ctrl‑C)
   tput cnorm       # show the cursor again

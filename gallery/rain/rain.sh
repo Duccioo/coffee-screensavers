@@ -12,7 +12,7 @@ RESET=$'\e[0m'
 # The characters for the raindrops
 DROPS=("┃" "│" "|")
 # Animation speed (lower is faster)
-DELAY=0.03
+DELAY=${SCREENSAVER_DELAY:-0.033}
 
 _cleanup_and_exit() { # handler for SIGINT (Ctrl‑C)
   tput cnorm # show cursor

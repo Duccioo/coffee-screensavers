@@ -9,7 +9,7 @@ COLORS=($'\e[31m' $'\e[32m' $'\e[33m' $'\e[34m' $'\e[35m' $'\e[36m' $'\e[91m' $'
 ROCKET_CHARS=("." "^" "+")
 # Defines the characters used in the explosion phases. The last one should be a space for clearing.
 EXPLOSION_PHASES=("*" "+" "." " ")
-DELAY_ROCKET=0.01
+DELAY_ROCKET=${SCREENSAVER_DELAY:-0.033}
 DELAY_EXPLOSION=0.08
 DELAY_DISSIPATE=0.2
 DELAY_BETWEEN=0.5

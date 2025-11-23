@@ -8,7 +8,7 @@
 COLORS=($'\e[31m' $'\e[32m' $'\e[33m' $'\e[34m' $'\e[35m' $'\e[36m')
 OBJECT_CHAR="O"
 NUM_OBJECTS=5
-SLEEP_TIME=0.03
+SLEEP_TIME=${SCREENSAVER_DELAY:-0.033}
 
 _cleanup_and_exit() { # handler for SIGINT (Ctrl‑C)
   tput cnorm # show cursor
