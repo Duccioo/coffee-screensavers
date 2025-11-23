@@ -240,7 +240,6 @@ _main_menu_cleanup() {
 
 main_menu() {
     local run_random_first=$1
-    trap _main_menu_cleanup EXIT
     if [[ "$run_random_first" == "random" ]]; then
         run_random
     fi
@@ -327,6 +326,7 @@ run_random() {
 
 main() {
     # Ensure cleanup on exit
+    trap _main_menu_cleanup EXIT
     trap 'exit 0' SIGINT
 
     local mode="menu"
