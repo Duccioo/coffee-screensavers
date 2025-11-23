@@ -14,7 +14,15 @@ BASH_SCREENSAVERS_DISCORD='https://discord.gg/BGQJCbYVBa'
 BASH_SCREENSAVERS_LICENSE='MIT'
 BASH_SCREENSAVERS_COPYRIGHT='Copyright (c) 2025 Attogram Project <https://github.com/attogram>'
 
-BASH_SCREENSAVERS_GALLERY="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)/gallery"
+# Resolve the directory of the script, handling symlinks
+SOURCE=${BASH_SOURCE[0]}
+while [ -L "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
+  SOURCE=$(readlink "$SOURCE")
+  [[ $SOURCE != /* ]] && SOURCE=$DIR/$SOURCE
+done
+DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
+BASH_SCREENSAVERS_GALLERY="$DIR/gallery"
 
 chosen_screensaver='' # the chosen one
 
@@ -61,8 +69,24 @@ Woah there, partner! This screensaver ain't ready for the big show yet.
         tput setaf 2 # back to green
         return 2
     fi
-    ( "$visual_goodness" ) # Execute the saver in a sub‑shell – isolates its `exit` from the menu script
-    return $?
+
+    # Use Alternate Screen Buffer for a clean experience
+    tput smcup
+
+    # Construct command
+    local cmd=("$visual_goodness")
+    # Check for caffeinate (macOS prevent sleep)
+    if command -v caffeinate &> /dev/null; then
+        cmd=(caffeinate -d "${cmd[@]}")
+    fi
+
+    # Run!
+    "${cmd[@]}"
+    local ret=$?
+
+    # Restore screen
+    tput rmcup
+    return $ret
 }
 
 intro() {
@@ -207,7 +231,9 @@ EOL
 }
 
 _main_menu_cleanup() {
-    tput sgr0 # Reset terminal attributes
+    tput cnorm # Ensure cursor is visible
+    tput sgr0  # Reset terminal attributes
+    tput rmcup # Ensure we leave alternate screen if we were in it
     echo; echo; echo 'Enjoyed Bash Screensavers? Give the project a star on GitHub! ✨'
     echo; echo "${BASH_SCREENSAVERS_URL}"; echo
 }
@@ -249,7 +275,7 @@ Oh no! Screensaver had trouble! Error code: %d
 }
 
 BASH_SCREENSAVERS_DESCRIPTION="A collection of screensavers written in bash."
-BASH_SCREENSAVERS_USAGE="Usage: $0 [-h|--help] [-v|--version] [-n <name>|--new <name>] [-r|--random] [name|number]"
+BASH_SCREENSAVERS_USAGE="Usage: $0 [-h|--help] [-v|--version] [-n <name>|--new <name>] [-r|--random] [-d] [-m <name>] [name|number]"
 
 run_direct() {
     local choice="$1"
@@ -300,28 +326,24 @@ run_random() {
 }
 
 main() {
-    if [[ "$1" ]]; then
+    # Ensure cleanup on exit
+    trap 'exit 0' SIGINT
+
+    local mode="menu"
+    local target=""
+
+    while [[ $# -gt 0 ]]; do
         case "$1" in
             -h|--help)
                 echo "$BASH_SCREENSAVERS_NAME v$BASH_SCREENSAVERS_VERSION"
                 echo "$BASH_SCREENSAVERS_DESCRIPTION"
                 echo
                 echo "$BASH_SCREENSAVERS_USAGE"
-                if [ $# -eq 1 ]; then
-                    exit 0
-                fi
-                shift
-                main "$@"
-                exit $?
+                exit 0
                 ;;
             -v|--version)
                 echo "$BASH_SCREENSAVERS_NAME v$BASH_SCREENSAVERS_VERSION"
-                if [ $# -eq 1 ]; then
-                    exit 0
-                fi
-                shift
-                main "$@"
-                exit $?
+                exit 0
                 ;;
             -n|--new)
                 if [ -z "$2" ]; then
@@ -333,16 +355,36 @@ main() {
                 exit 0
                 ;;
             -r|--random)
-                main_menu "random"
-                exit 0
+                mode="random"
+                shift
+                ;;
+            -d)
+                # Caffeinate is handled automatically if present, but this flag acknowledges the intent.
+                shift
+                ;;
+            -m)
+                mode="direct"
+                target="$2"
+                shift 2
                 ;;
             *)
-                run_direct "$1"
-                exit 0
+                # Backward compatibility: if first arg is not flag, treat as direct run or check next
+                if [[ "$mode" == "menu" ]]; then
+                     mode="direct"
+                     target="$1"
+                fi
+                shift
                 ;;
         esac
+    done
+
+    if [[ "$mode" == "random" ]]; then
+        main_menu "random"
+    elif [[ "$mode" == "direct" ]]; then
+        run_direct "$target"
+    else
+        main_menu
     fi
-    main_menu
 }
 
 main "$@"

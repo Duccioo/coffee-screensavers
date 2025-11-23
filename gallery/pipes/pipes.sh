@@ -317,7 +317,7 @@ main() {
     init_pipes
 
     # any key press exits the loop and this script
-    trap cleanup INT
+    trap cleanup EXIT INT TERM
 
     local i
     while REPLY=; do
