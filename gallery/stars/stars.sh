@@ -11,7 +11,7 @@ C_YELLOW=$'\e[93m'
 C_BLUE=$'\e[94m'
 C_CYAN=$'\e[96m'
 COLORS=("$C_WHITE" "$C_YELLOW" "$C_BLUE" "$C_CYAN")
-DELAY=0.02
+DELAY=${SCREENSAVER_DELAY:-0.033}
 
 # The characters for the stars
 STARS=("*" "." "+" "'" "O")

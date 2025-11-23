@@ -8,7 +8,7 @@
 
 # --- Configuration ---
 INITIAL_DENSITY=20 # Percentage of initially live cells (approx)
-SLEEP_DURATION=0.001
+SLEEP_DURATION=${SCREENSAVER_DELAY:-0.033}
 
 # --- Terminal Setup & Globals ---
 # Use full terminal size initially

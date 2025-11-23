@@ -29,7 +29,7 @@ VERSION=1.3.0
 
 M=32768  # Bash RANDOM maximum + 1
 p=1      # number of pipes
-f=75     # frame rate
+f=${SCREENSAVER_FPS:-30}     # frame rate
 s=13     # probability of straight fitting
 r=2000   # characters limit
 t=0      # iteration counter for -r character limit

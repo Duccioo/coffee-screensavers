@@ -7,7 +7,7 @@
 # --- Configuration ---
 CHARS=("." "o" "O" "*" "0")
 COLORS=($'\e[31m' $'\e[32m' $'\e[33m' $'\e[34m' $'\e[35m' $'\e[36m')
-DELAY=0.02
+DELAY=${SCREENSAVER_DELAY:-0.033}
 
 _cleanup_and_exit() { # handler for SIGINT (Ctrl‑C)
   tput cnorm       # show the cursor again

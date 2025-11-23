@@ -14,6 +14,10 @@ BASH_SCREENSAVERS_DISCORD='https://discord.gg/BGQJCbYVBa'
 BASH_SCREENSAVERS_LICENSE='MIT'
 BASH_SCREENSAVERS_COPYRIGHT='Copyright (c) 2025 Attogram Project <https://github.com/attogram>'
 
+# Global Performance Settings
+export SCREENSAVER_FPS=30
+export SCREENSAVER_DELAY=0.033
+
 # Resolve the directory of the script, handling symlinks
 SOURCE=${BASH_SOURCE[0]}
 while [ -L "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
@@ -205,7 +209,7 @@ animate() {
         local y=\$((RANDOM % height))
         tput cup \$y \$x
         echo "*"
-        sleep 0.1
+        sleep \${SCREENSAVER_DELAY:-0.033}
     done
 }
 
