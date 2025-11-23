@@ -382,7 +382,7 @@ cleanup_and_exit() {
     exit 0
 }
 
-trap cleanup_and_exit SIGINT
+trap cleanup_and_exit EXIT INT TERM
 
 # --- The Main Event ---
 the_show_must_go_on() {

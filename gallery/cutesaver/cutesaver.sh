@@ -17,7 +17,7 @@ _cleanup_and_exit() { # handler for SIGINT (Ctrl‑C)
   tput sgr0 # restore screen
   exit 0
 }
-trap _cleanup_and_exit SIGINT # Catch all common exit signals
+trap _cleanup_and_exit EXIT INT TERM # Catch all common exit signals
 
 cd "$( dirname "${BASH_SOURCE[0]}" )" || exit
 

@@ -12,7 +12,7 @@ _cleanup_and_exit() { # handler for SIGINT (Ctrl‑C)
   exit 0
 }
 
-trap _cleanup_and_exit SIGINT # Ctrl‑C
+trap _cleanup_and_exit EXIT INT TERM # Ctrl‑C
 
 # Get terminal dimensions
 width=$(tput cols)
