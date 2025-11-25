@@ -20,9 +20,9 @@ update_grid() {
     local time_offset=$1
     for ((y=0; y<GRID_H; y++)); do
         for ((x=0; x<GRID_W; x++)); do
-            # Scale the coordinates to make the noise field appear larger and smoother
-            local scaled_x=$((x * 8))
-            local scaled_y=$((y * 8))
+            # Stretch the noise field horizontally for a more "dunes" like effect
+            local scaled_x=$((x * 16))
+            local scaled_y=$((y * 4))
             local val=$(pnoise $scaled_x $scaled_y $time_offset)
             NOISE_GRID[y * GRID_W + x]=$val
         done
@@ -81,11 +81,11 @@ animate() {
     # Color Palette: Warm, sandy tones
     local palette=(230 229 228 222 221 220 215 214 209 208 203 202)
 
-    local time=0
+    local time_offset=0
     clear
 
     while true; do
-        update_grid $((time * speed / 2))
+        update_grid $time_offset
         local frame_buffer="\e[H"
 
         for ((y=0; y<height; y++)); do
@@ -128,7 +128,7 @@ animate() {
 
         printf '%b' "$frame_buffer"
         sleep "$delay"
-        time=$((time + 1))
+        time_offset=$((time_offset + speed))
     done
 }
 

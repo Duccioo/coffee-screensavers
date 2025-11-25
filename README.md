@@ -41,21 +41,26 @@ git clone https://github.com/attogram/bash-screensavers.git
 cd bash-screensavers
 ./screensaver.sh
 ```
+
+### macOS Power Management
+
+On macOS, the script will automatically use `caffeinate -d` to prevent the display from sleeping. This ensures an uninterrupted screensaver experience.
 ```
-Bash Screensavers v0.0.27 (Mystic Shine)
+Bash Screensavers v0.0.28 (Mystic Dunes)
 
   1 . alpha        - random colorful pixels
   2 . bouncing     - bouncing 'O' madness
   3 . cutesaver    - infinite loop of cuteness
-  4 . fireworks    - Ooh! Aah! Pretty lights!
-  5 . life         - cellular automata
-  6 . matrix       - the matrix has you
-  7 . pipes        - an endless pipe maze
-  8 . rain         - soothing, gentle rain
-  9 . speaky       - dramatic talking screensaver
-  10. stars        - twinkling starfield
-  11. tunnel       - fly into the digital tunnel
-  12. vibe         - vibe coding
+  4 . dunes        - animated Perlin noise
+  5 . fireworks    - Ooh! Aah! Pretty lights!
+  6 . life         - cellular automata
+  7 . matrix       - the matrix has you
+  8 . pipes        - an endless pipe maze
+  9 . rain         - soothing, gentle rain
+  11. speaky       - dramatic talking screensaver
+  12. stars        - twinkling starfield
+  13. tunnel       - fly into the digital tunnel
+  14. vibe         - vibe coding
 
 (Press ^C to exit)
 
