@@ -13,8 +13,10 @@ trap _cleanup_and_exit EXIT INT TERM QUIT
 
 # Check dependencies
 if ! command -v bc &> /dev/null; then
+    tput rmcup # Restore screen to show error
     echo "Error: 'bc' is not installed. Please install 'bc' to run this screensaver." >&2
-    sleep 3
+    echo "Press any key to exit..."
+    read -n 1 -s -r
     exit 1
 fi
 
@@ -32,11 +34,14 @@ declare -a SIN_LUT
 echo "Calculating math..."
 # Use bc to generate table
 MATH_DATA_STR=$(bc -l <<EOF
-scale=0
 for (i=0; i<3600; i++) {
     a = i * 3.1415926535 / 1800
-    print 10000 * c(a); print "\n"
-    print 10000 * s(a); print "\n"
+    scale=20
+    c_val = 10000 * c(a)
+    s_val = 10000 * s(a)
+    scale=0
+    print c_val / 1; print "\n"
+    print s_val / 1; print "\n"
 }
 EOF
 )
