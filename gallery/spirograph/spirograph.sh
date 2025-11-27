@@ -117,7 +117,8 @@ animate() {
 
         # --- Generative Parameters ---
         # Output one value per line for POSIX bc compatibility
-        PARAMS_STR=$(bc -l <<EOF 2>&1
+        # Do not use -l here to avoid default scale=20 which breaks integer modulo
+        PARAMS_STR=$(bc <<EOF 2>&1
 scale=0
 # Random seeds
 seed = $RANDOM
@@ -138,13 +139,13 @@ oy = ((seed / 11) % 40) - 20
 # Rotation Step Speed (1 to 5)
 step = (seed % 5) + 1
 
-r_outer
-r_inner
-d_off
-zoom
-ox
-oy
-step
+r_outer / 1
+r_inner / 1
+d_off / 1
+zoom / 1
+ox / 1
+oy / 1
+step / 1
 EOF
 )
         # Parse params from newline-separated string
