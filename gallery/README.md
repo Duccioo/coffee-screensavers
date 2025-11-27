@@ -15,6 +15,7 @@ Please, feel free to browse our collection and find the perfect animation to ado
 [pipes](#pipes) -
 [rain](#rain) -
 [speaky](#speaky) -
+[spirograph](#spirograph) -
 [stars](#stars) -
 [tunnel](#tunnel) -
 [vibe](#vibe)
@@ -155,6 +156,21 @@ Please, feel free to browse our collection and find the perfect animation to ado
 **License:** MIT
 
 **[View Cast](./speaky/speaky.cast)**
+
+---
+## [spirograph](./spirograph/)
+
+*generative spirograph art*
+
+![Preview](./spirograph/spirograph.gif)
+
+**Description:** Generative spirograph art rendering slowly in monochrome pixels. Watch as complex geometric patterns emerge from the void, creating a unique and mesmerizing wireframe every time.
+
+**Authors:** Jules
+
+**License:** MIT
+
+**[View Cast](./spirograph/spirograph.cast)**
 
 ---
 ## [stars](./stars/)
