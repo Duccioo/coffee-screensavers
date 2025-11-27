@@ -5,9 +5,18 @@
 # "Pixel" style using double-width characters.
 
 _cleanup_and_exit() {
-  tput cnorm; tput sgr0; clear; exit 0
+  local code=$?
+  tput cnorm; tput sgr0; clear
+  exit $code
 }
 trap _cleanup_and_exit EXIT INT TERM QUIT
+
+# Check dependencies
+if ! command -v bc &> /dev/null; then
+    echo "Error: 'bc' is not installed. Please install 'bc' to run this screensaver." >&2
+    sleep 3
+    exit 1
+fi
 
 # Constants
 WIDTH=$(tput cols)
