@@ -1,9 +1,9 @@
 #!/usr/bin/env bats
 
-load 'jury/test_libs/bats-support-0.3.0/load.bash'
-load 'jury/test_libs/bats-assert-2.2.0/load.bash'
+load 'test_libs/bats-support-0.3.0/load.bash'
+load 'test_libs/bats-assert-2.2.0/load.bash'
 
-SCRIPT="gallery/perlin-ascii/perlin-ascii.sh"
+SCRIPT="../gallery/perlin-ascii/perlin-ascii.sh"
 
 @test "perlin-ascii: should be executable" {
   assert [ -x "$SCRIPT" ]
