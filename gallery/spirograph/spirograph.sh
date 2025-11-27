@@ -14,8 +14,12 @@ trap _cleanup_and_exit EXIT INT TERM QUIT
 fail() {
     tput rmcup # Restore screen to show error
     echo "Error: $1" >&2
-    echo "Press any key to exit..."
-    read -n 1 -s -r
+    if [[ -n "$2" ]]; then
+        echo "Details:" >&2
+        echo "$2" | head -n 10 >&2
+    fi
+    echo "Press Enter to exit..."
+    read -r
     exit 1
 }
 
@@ -43,7 +47,8 @@ declare -a SIN_LUT
 echo "Calculating math..."
 # Use bc to generate table
 # Note: Output one value per line for POSIX bc compatibility (avoiding 'print')
-MATH_DATA_STR=$(bc -l <<EOF
+# Capture stderr to debug failures
+MATH_DATA_STR=$(bc -l <<EOF 2>&1
 for (i=0; i<3600; i++) {
     a = i * 3.1415926535 / 1800
     scale=20
@@ -63,7 +68,7 @@ MATH_DATA=($MATH_DATA_STR)
 IFS=$OLD_IFS
 
 if [[ ${#MATH_DATA[@]} -lt 7200 ]]; then
-    fail "Math generation failed (bc output incomplete)."
+    fail "Math generation failed (bc output incomplete)." "$MATH_DATA_STR"
 fi
 
 for ((i=0; i<3600; i++)); do
@@ -112,7 +117,7 @@ animate() {
 
         # --- Generative Parameters ---
         # Output one value per line for POSIX bc compatibility
-        PARAMS_STR=$(bc -l <<EOF
+        PARAMS_STR=$(bc -l <<EOF 2>&1
 scale=0
 # Random seeds
 seed = $RANDOM
@@ -146,10 +151,7 @@ EOF
         PARAMS_ARR=($PARAMS_STR)
 
         if [[ ${#PARAMS_ARR[@]} -lt 7 ]]; then
-             # Silent retry or fail? Fail is safer to debug.
-             # But inside loop, maybe just use defaults?
-             # Let's fail to catch the issue.
-             fail "Parameter generation failed."
+             fail "Parameter generation failed." "$PARAMS_STR"
         fi
 
         local R=${PARAMS_ARR[0]}
@@ -191,7 +193,7 @@ EOF
              draw_pixel "$x" "$y"
 
              t=$((t + step))
-             sleep 0.01
+             sleep "${SCREENSAVER_DELAY:-0.033}"
         done
 
         sleep 3
