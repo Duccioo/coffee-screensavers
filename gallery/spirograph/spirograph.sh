@@ -6,7 +6,7 @@
 
 _cleanup_and_exit() {
   local code=$?
-  tput cnorm; tput sgr0; clear
+  tput cnorm; tput sgr0; tput rmcup
   exit $code
 }
 trap _cleanup_and_exit EXIT INT TERM QUIT
