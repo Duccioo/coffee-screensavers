@@ -117,7 +117,8 @@ animate() {
 
         # --- Generative Parameters ---
         # Output one value per line for POSIX bc compatibility
-        PARAMS_STR=$(bc -l <<EOF 2>&1
+        # Do not use -l here to avoid default scale=20 which breaks integer modulo
+        PARAMS_STR=$(bc <<EOF 2>&1
 scale=0
 # Random seeds
 seed = $RANDOM
