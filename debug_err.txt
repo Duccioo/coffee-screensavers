@@ -1,0 +1,1 @@
+/app/gallery/spirograph/spirograph.sh: line 7: 35998 Hangup                  sleep 0.01
