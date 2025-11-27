@@ -11,24 +11,40 @@ trap _cleanup_and_exit EXIT INT TERM QUIT
 GRID_W=12
 GRID_H=8
 declare -a NOISE_GRID
+declare -a TARGET_GRID
 
 # Block Characters Ramp (Generative Art Style)
 # Using array for multi-byte character safety in Bash 3.2
 CHARS=(" " "░" "▒" "▓" "█")
 
 # Init
-for ((i=0; i<GRID_W*GRID_H; i++)); do NOISE_GRID[i]=$((RANDOM % 256)); done
+for ((i=0; i<GRID_W*GRID_H; i++)); do
+    NOISE_GRID[i]=$((RANDOM % 256))
+    TARGET_GRID[i]=$((RANDOM % 256))
+done
 
 update_grid() {
     for ((i=0; i<GRID_W*GRID_H; i++)); do
-        local r=$((RANDOM % 10))
-        local val=${NOISE_GRID[i]}
-        if ((r < 4)); then val=$((val - 8));
-        elif ((r < 8)); then val=$((val + 8)); fi
+        local current=${NOISE_GRID[i]}
+        local target=${TARGET_GRID[i]}
 
-        if ((val < 20)); then val=$((val + 3)); fi
-        if ((val > 235)); then val=$((val - 3)); fi
-        NOISE_GRID[i]=$val
+        # Calculate difference
+        local diff=$((target - current))
+
+        if (( diff == 0 )); then
+            # Reached target, pick new one
+            TARGET_GRID[i]=$((RANDOM % 256))
+        else
+            # Move towards target with easing
+            local step=$(( diff / 16 ))
+
+            # Ensure minimum movement of 1 to prevent stalling
+            if (( step == 0 )); then
+                if (( diff > 0 )); then step=1; else step=-1; fi
+            fi
+
+            NOISE_GRID[i]=$(( current + step ))
+        fi
     done
 }
 
