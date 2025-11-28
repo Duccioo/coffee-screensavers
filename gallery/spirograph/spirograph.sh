@@ -139,13 +139,13 @@ oy = ((seed / 11) % 40) - 20
 # Rotation Step Speed (1 to 5)
 step = (seed % 5) + 1
 
-r_outer
-r_inner
-d_off
-zoom
-ox
-oy
-step
+r_outer / 1
+r_inner / 1
+d_off / 1
+zoom / 1
+ox / 1
+oy / 1
+step / 1
 EOF
 )
         # Parse params from newline-separated string
