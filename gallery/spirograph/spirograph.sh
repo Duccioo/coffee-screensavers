@@ -36,9 +36,6 @@ if [[ -z "$WIDTH" || -z "$HEIGHT" ]]; then
     fail "Could not determine terminal dimensions."
 fi
 
-HALF_WIDTH=$((WIDTH / 2))
-if ((HALF_WIDTH < 1)); then HALF_WIDTH=1; fi
-
 # Precompute LUT for Sin/Cos (0-360 degrees -> 0-3599 index)
 # Precision: 0.1 degrees. Scale: 10000.
 declare -a COS_LUT
@@ -92,8 +89,8 @@ draw_pixel() {
     local y=$2
 
     # Check bounds
-    if ((x >= 0 && x < HALF_WIDTH && y >= 0 && y < HEIGHT)); then
-         local idx=$((y * HALF_WIDTH + x))
+    if ((x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT)); then
+         local idx=$((y * WIDTH + x))
          local val=${GRID[idx]:-0}
 
          if ((val < 23)); then
@@ -102,9 +99,9 @@ draw_pixel() {
 
              local color=$((232 + val))
 
-             tput cup $y $((x * 2))
+             tput cup $y $x
              tput setab $color
-             echo -n "  "
+             echo -n " "
          fi
     fi
 }
@@ -117,7 +114,8 @@ animate() {
 
         # --- Generative Parameters ---
         # Output one value per line for POSIX bc compatibility
-        PARAMS_STR=$(bc -l <<EOF 2>&1
+        # Do not use -l here to avoid default scale=20 which breaks integer modulo
+        PARAMS_STR=$(bc <<EOF 2>&1
 scale=0
 # Random seeds
 seed = $RANDOM
@@ -138,13 +136,13 @@ oy = ((seed / 11) % 40) - 20
 # Rotation Step Speed (1 to 5)
 step = (seed % 5) + 1
 
-r_outer
-r_inner
-d_off
-zoom
-ox
-oy
-step
+r_outer / 1
+r_inner / 1
+d_off / 1
+zoom / 1
+ox / 1
+oy / 1
+step / 1
 EOF
 )
         # Parse params from newline-separated string
@@ -166,7 +164,7 @@ EOF
         local t=0
 
         # Determine center
-        local cx=$((HALF_WIDTH / 2 + ox))
+        local cx=$((WIDTH / 2 + ox))
         local cy=$((HEIGHT / 2 + oy))
 
         # Draw loop
@@ -193,7 +191,10 @@ EOF
              draw_pixel "$x" "$y"
 
              t=$((t + step))
-             sleep "${SCREENSAVER_DELAY:-0.033}"
+             # Optimization: Draw in chunks to speed up animation
+             if (( i % 50 == 0 )); then
+                 sleep "${SCREENSAVER_DELAY:-0.033}"
+             fi
         done
 
         sleep 3
