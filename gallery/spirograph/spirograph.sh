@@ -167,8 +167,8 @@ EOF
         local cx=$((WIDTH / 2 + ox))
         local cy=$((HEIGHT / 2 + oy))
 
-        # Draw loop
-        for ((i=0; i<8000; i++)); do
+        # Draw loop - Increased iterations for finer resolution
+        for ((i=0; i<30000; i++)); do
              # Calculate angles (indices into 0-3599 LUT)
              local idx1=$(( t % 3600 ))
              local idx2=$(( (t * ratio_scaled / 1000) % 3600 ))
@@ -185,14 +185,20 @@ EOF
              local raw_x=$(( term1_coeff * cos1 + d * cos2 ))
              local raw_y=$(( term1_coeff * sin1 - d * sin2 ))
 
-             local x=$(( raw_x * zoom / 100000 + cx ))
+             # Aspect ratio correction:
+             # Terminal characters are typically ~2x taller than wide.
+             # We scale X by 2 (relative to Y) to make circles circular.
+             # Zoom is applied equally, then X is doubled (or Y halved).
+             # Here we effectively double the horizontal resolution logic.
+
+             local x=$(( (raw_x * zoom * 2) / 100000 + cx ))
              local y=$(( raw_y * zoom / 100000 + cy ))
 
              draw_pixel "$x" "$y"
 
              t=$((t + step))
-             # Optimization: Draw in chunks to speed up animation
-             if (( i % 50 == 0 )); then
+             # Optimization: Draw in larger chunks to speed up animation
+             if (( i % 200 == 0 )); then
                  sleep "${SCREENSAVER_DELAY:-0.033}"
              fi
         done
