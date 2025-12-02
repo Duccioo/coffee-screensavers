@@ -88,8 +88,8 @@ update_grid() {
             TARGET_GRID[i]=$((RANDOM % 256))
         else
             # Move towards target with easing
-            # Faster speed: divide by 8 instead of 16
-            local step=$(( diff / 8 ))
+            # Faster speed: divide by 4 instead of 16
+            local step=$(( diff / 4 ))
 
             # Ensure minimum movement of 1 to prevent stalling
             if (( step == 0 )); then
