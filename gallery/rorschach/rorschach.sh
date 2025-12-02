@@ -15,26 +15,21 @@ GRID_H=10
 declare -a NOISE_GRID
 declare -a TARGET_GRID
 
-# Symmetry flags
-SYM_V=0
-SYM_H=0
-SYM_D=0
+# Symmetry Mode
+# 0 = Vertical (Rorschach Classic)
+# 1 = Horizontal (Water Reflection)
+# 2 = Diagonal (Cross)
+# 3 = Quad (Vertical + Horizontal)
+# 4 = Kaleidoscope (Vertical + Horizontal + Diagonal)
+SYM_MODE=0
 
 init_symmetry() {
-    # Randomly select symmetries
-    # 0 = OFF, 1 = ON
-    # Ensure at least one is ON
-    while [[ $SYM_V -eq 0 && $SYM_H -eq 0 && $SYM_D -eq 0 ]]; do
-        SYM_V=$((RANDOM % 2))
-        SYM_H=$((RANDOM % 2))
-        SYM_D=$((RANDOM % 2))
-    done
+    SYM_MODE=$((RANDOM % 5))
 }
 
 symmetrize_grid() {
-    # 1. Diagonal Symmetry (Source: Upper-Triangle, Target: Lower-Triangle)
-    # Mirror across x = y
-    if [[ $SYM_D -eq 1 ]]; then
+    # Helper to copy Upper-Right Triangle to Lower-Left Triangle (Diagonal Mirror)
+    if [[ $SYM_MODE -eq 2 || $SYM_MODE -eq 4 ]]; then
         for ((y=0; y<GRID_H; y++)); do
             for ((x=y+1; x<GRID_W; x++)); do
                 local source_idx=$((y * GRID_W + x))
@@ -45,8 +40,8 @@ symmetrize_grid() {
         done
     fi
 
-    # 2. Vertical Symmetry (Source: Left, Target: Right)
-    if [[ $SYM_V -eq 1 ]]; then
+    # Helper to copy Left Half to Right Half (Vertical Mirror)
+    if [[ $SYM_MODE -eq 0 || $SYM_MODE -eq 3 || $SYM_MODE -eq 4 ]]; then
         local half_w=$((GRID_W / 2))
         for ((y=0; y<GRID_H; y++)); do
             for ((x=0; x<half_w; x++)); do
@@ -58,8 +53,8 @@ symmetrize_grid() {
         done
     fi
 
-    # 3. Horizontal Symmetry (Source: Top, Target: Bottom)
-    if [[ $SYM_H -eq 1 ]]; then
+    # Helper to copy Top Half to Bottom Half (Horizontal Mirror)
+    if [[ $SYM_MODE -eq 1 || $SYM_MODE -eq 3 || $SYM_MODE -eq 4 ]]; then
         local half_h=$((GRID_H / 2))
         for ((y=0; y<half_h; y++)); do
             for ((x=0; x<GRID_W; x++)); do
@@ -122,10 +117,6 @@ animate() {
     local gw_minus_1=$((GRID_W - 1))
     local gh_minus_1=$((GRID_H - 1))
 
-    # Segment width in calc_pixels
-    local seg_w=$(( calc_width / gw_minus_1 ))
-    if ((seg_w < 1)); then seg_w=1; fi
-
     # Palette: 5 distinct shades for posterized look
     local palette=(232 237 242 247 252)
 
@@ -136,7 +127,7 @@ animate() {
         local frame_buffer="\e[H"
 
         for ((y=0; y<height; y++)); do
-            # Vertical interpolation
+            # Vertical interpolation logic (unchanged)
             local y_scaled=$(( y * gh_minus_1 * 1000 / height ))
             local gy=$(( y_scaled / 1000 ))
             local ry=$(( y_scaled % 1000 ))
@@ -151,39 +142,31 @@ animate() {
                 current_row_vals+=("$v")
             done
 
-            local current_x=0 # In calc pixels
             local color=232 # Default color
 
-            for ((gx=0; gx<gw_minus_1; gx++)); do
-                local v_left=${current_row_vals[gx]}
-                local v_right=${current_row_vals[gx+1]}
+            # Correct Horizontal Interpolation
+            # Directly map screen x (current_x) to grid coordinates (gx)
+            # This avoids the "margin fix" loop and ensures even coverage
+            for ((current_x=0; current_x<calc_width; current_x++)); do
+                 local x_scaled=$(( current_x * gw_minus_1 * 1000 / calc_width ))
+                 local gx=$(( x_scaled / 1000 ))
+                 local rx=$(( x_scaled % 1000 ))
 
-                local val_scaled=$(( v_left * 1000 ))
-                local step_scaled=$(( (v_right - v_left) * 1000 / seg_w ))
+                 local v_left=${current_row_vals[gx]}
+                 local v_right=${current_row_vals[gx+1]}
 
-                for ((k=0; k<seg_w; k++)); do
-                     if ((current_x >= calc_width)); then break; fi
+                 # Interpolate
+                 local val=$(( v_left + (v_right - v_left) * rx / 1000 ))
 
-                     local val=$(( val_scaled / 1000 ))
-                     val_scaled=$(( val_scaled + step_scaled ))
+                 # Quantize / Posterize
+                 local p_idx=$(( val * 5 / 256 ))
+                 if ((p_idx > 4)); then p_idx=4; fi
+                 if ((p_idx < 0)); then p_idx=0; fi
 
-                     # Quantize / Posterize
-                     local p_idx=$(( val * 5 / 256 ))
-                     if ((p_idx > 4)); then p_idx=4; fi
-                     if ((p_idx < 0)); then p_idx=0; fi
+                 color=${palette[$p_idx]}
 
-                     color=${palette[$p_idx]}
-
-                     # Render DOUBLE SPACE for 1 calc pixel
-                     frame_buffer+="\e[48;5;${color}m  "
-                     current_x=$((current_x + 1))
-                done
-            done
-
-            # Fill remaining calc pixels (margin fix)
-            while ((current_x < calc_width)); do
+                 # Render DOUBLE SPACE for 1 calc pixel
                  frame_buffer+="\e[48;5;${color}m  "
-                 current_x=$((current_x + 1))
             done
 
             # Fill remaining real pixels (if width is odd)
