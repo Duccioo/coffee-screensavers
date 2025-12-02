@@ -15,26 +15,21 @@ GRID_H=10
 declare -a NOISE_GRID
 declare -a TARGET_GRID
 
-# Symmetry flags
-SYM_V=0
-SYM_H=0
-SYM_D=0
+# Symmetry Mode
+# 0 = Vertical (Rorschach Classic)
+# 1 = Horizontal (Water Reflection)
+# 2 = Diagonal (Cross)
+# 3 = Quad (Vertical + Horizontal)
+# 4 = Kaleidoscope (Vertical + Horizontal + Diagonal)
+SYM_MODE=0
 
 init_symmetry() {
-    # Randomly select symmetries
-    # 0 = OFF, 1 = ON
-    # Ensure at least one is ON
-    while [[ $SYM_V -eq 0 && $SYM_H -eq 0 && $SYM_D -eq 0 ]]; do
-        SYM_V=$((RANDOM % 2))
-        SYM_H=$((RANDOM % 2))
-        SYM_D=$((RANDOM % 2))
-    done
+    SYM_MODE=$((RANDOM % 5))
 }
 
 symmetrize_grid() {
-    # 1. Diagonal Symmetry (Source: Upper-Triangle, Target: Lower-Triangle)
-    # Mirror across x = y
-    if [[ $SYM_D -eq 1 ]]; then
+    # Helper to copy Upper-Right Triangle to Lower-Left Triangle (Diagonal Mirror)
+    if [[ $SYM_MODE -eq 2 || $SYM_MODE -eq 4 ]]; then
         for ((y=0; y<GRID_H; y++)); do
             for ((x=y+1; x<GRID_W; x++)); do
                 local source_idx=$((y * GRID_W + x))
@@ -45,8 +40,8 @@ symmetrize_grid() {
         done
     fi
 
-    # 2. Vertical Symmetry (Source: Left, Target: Right)
-    if [[ $SYM_V -eq 1 ]]; then
+    # Helper to copy Left Half to Right Half (Vertical Mirror)
+    if [[ $SYM_MODE -eq 0 || $SYM_MODE -eq 3 || $SYM_MODE -eq 4 ]]; then
         local half_w=$((GRID_W / 2))
         for ((y=0; y<GRID_H; y++)); do
             for ((x=0; x<half_w; x++)); do
@@ -58,8 +53,8 @@ symmetrize_grid() {
         done
     fi
 
-    # 3. Horizontal Symmetry (Source: Top, Target: Bottom)
-    if [[ $SYM_H -eq 1 ]]; then
+    # Helper to copy Top Half to Bottom Half (Horizontal Mirror)
+    if [[ $SYM_MODE -eq 1 || $SYM_MODE -eq 3 || $SYM_MODE -eq 4 ]]; then
         local half_h=$((GRID_H / 2))
         for ((y=0; y<half_h; y++)); do
             for ((x=0; x<GRID_W; x++)); do
