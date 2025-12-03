@@ -189,10 +189,10 @@ animate() {
 
                  if (( val < 50 )); then
                     p_idx=0 # Transparent
-                 elif (( val > 240 )); then
+                 elif (( val > 230 )); then
                     # Check for sparse accent
                     # High threshold + Random chance
-                    if (( (RANDOM % 10) > 7 )); then
+                    if (( (RANDOM % 10) > 5 )); then
                         p_idx=5 # Orange
                     else
                         p_idx=4 # Brightest Gray
